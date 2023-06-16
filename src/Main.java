@@ -1,7 +1,14 @@
 import java.sql.*;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
+
+        Scanner s1 = new Scanner(System.in);
+
+        System.out.println("Inserisci il tuo filtro");
+
+        String filtro = s1.next();
 
         String url = "jdbc:mysql://localhost:3306/db-nations";
         String user = "😊";
@@ -15,10 +22,13 @@ public class Main {
                     FROM countries
                     INNER JOIN regions ON countries.region_id = regions.region_id
                     INNER JOIN continents ON continents.continent_id = regions.continent_id
+                    WHERE countries.name LIKE ?
                     ORDER BY countries.name ASC;
                     """;
 
             try (PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setString(1, "%" + filtro + "%");
 
                 try (ResultSet rs = ps.executeQuery()) {
 
@@ -28,7 +38,6 @@ public class Main {
                         int idNazione = rs.getInt(2);
                         String nomeRegione = rs.getString(3);
                         String nomeContinente = rs.getString(4);
-
                         System.out.println("nome nazione - " + nomeNazione + " / ID Nazione - " + idNazione + " / Nome Regione - " + nomeRegione + " / Nome Continente - " + nomeContinente);
                     }
                 }
@@ -36,5 +45,6 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        s1.close();
     }
 }
